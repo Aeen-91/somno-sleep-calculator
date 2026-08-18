@@ -1,0 +1,6 @@
+{
+  "name": "Somno",
+  "description": "Smart sleep calculator, REM cycle visualizer, and AI-driven sleep analysis with liquid glassy UI and English/Persian support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

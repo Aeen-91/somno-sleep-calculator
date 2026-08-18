@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Ambient circular glow behind moon -->
+    <path
+        android:pathData="M54,54m-32,0a32,32 0 1,1 64,0a32,32 0 1,1 -64,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="54"
+                android:centerY="54"
+                android:gradientRadius="34"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#44818CF8" />
+                <item android:offset="0.7" android:color="#2206B6D4" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Outer Orbital Sleep Cycle Ring (Cyan to Purple) -->
+    <path
+        android:pathData="M54,28 A26,26 0 1,0 78,64"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#38BDF8"
+        android:fillColor="#00000000" />
+
+    <!-- Sleep Cycle Nodes (Dot indicators representing sleep stages) -->
+    <path
+        android:pathData="M54,28m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#38BDF8" />
+    <path
+        android:pathData="M28,54m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#A855F7" />
+    <path
+        android:pathData="M78,64m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#EC4899" />
+
+    <!-- Luminous Crescent Moon -->
+    <path
+        android:pathData="M51.5,35.5 C42,37 36,45 37,54.5 C38,64 46,71.5 55.5,70.5 C59.5,70 63,68 65.5,65 C58,65.5 50.5,60 49,52.5 C47.5,45.5 51,39 56.5,36 C55,35.7 53.2,35.4 51.5,35.5 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="36"
+                android:startY="36"
+                android:endX="66"
+                android:endY="71"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#E0E7FF" />
+                <item android:offset="0.5" android:color="#C7D2FE" />
+                <item android:offset="1.0" android:color="#818CF8" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Sparkle Stars -->
+    <path
+        android:pathData="M68,34 L69,37 L72,38 L69,39 L68,42 L67,39 L64,38 L67,37 Z"
+        android:fillColor="#FDE047" />
+    <path
+        android:pathData="M40,32 L40.7,33.8 L42.5,34.5 L40.7,35.2 L40,37 L39.3,35.2 L37.5,34.5 L39.3,33.8 Z"
+        android:fillColor="#BAE6FD" />
+    <path
+        android:pathData="M69,52 L69.5,53.5 L71,54 L69.5,54.5 L69,56 L68.5,54.5 L67,54 L68.5,53.5 Z"
+        android:fillColor="#DDD6FE" />
+
+</vector>
