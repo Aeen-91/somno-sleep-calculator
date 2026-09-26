@@ -21,6 +21,11 @@ android {
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    val abi = providers.gradleProperty("somno.abi").orNull
+    if (!abi.isNullOrBlank()) {
+      ndk { abiFilters += listOf(abi) }
+    }
   }
 
   signingConfigs {

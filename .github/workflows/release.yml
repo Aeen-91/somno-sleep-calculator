@@ -56,7 +56,20 @@ jobs:
           chmod +x ./gradlew
 
       - name: Build release APK
-        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+        run: ./gradlew :app:assembleRelease -Psomno.abi=arm64-v8a --no-daemon --stacktrace
+
+      - name: Verify arm64-only packaging
+        id: verify
+        run: |
+          set -euo pipefail
+          apk="$(ls app/build/outputs/apk/release/*.apk | head -n 1)"
+          abis="$(python3 -c "import sys,zipfile;z=zipfile.ZipFile(sys.argv[1]);print(','.join(sorted({n.split('/')[1] for n in z.namelist() if n.startswith('lib/') and n.count('/')>1})) or 'none')" "$apk")"
+          echo "packaged ABIs: $abis"
+          if [ "$abis" != "arm64-v8a" ]; then
+            echo "::error::Expected only arm64-v8a, found: $abis"
+            exit 1
+          fi
+          echo "abis=$abis" >> "$GITHUB_OUTPUT"
 
       - name: Collect artifact
         id: collect
@@ -86,6 +99,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
           APK_NAME: ${{ steps.collect.outputs.name }}
+          ABIS: ${{ steps.verify.outputs.abis }}
         run: |
           set -euo pipefail
           notes="$(mktemp)"
@@ -101,7 +115,7 @@ jobs:
             echo "Download the APK, allow \`Install from unknown sources\`, then open it."
             echo
             echo "### Notes"
-            echo "- \`arm64-v8a\` (and every other ABI): the app ships no native \`.so\` libraries, so this single APK is architecture independent and runs natively on arm64 devices."
+            echo "- Built for **arm64-v8a only** (verified: packaged ABIs = \`$ABIS\`). The app's native code comes from \`androidx.graphics-path\` and \`androidx.datastore\`; only the arm64 variants are bundled, so it will not run on 32-bit or x86 devices/emulators."
             echo "- minSdk 24 (Android 7.0), targetSdk 36."
             echo "- Signed with the standard Android debug key. Sideload only; it cannot be uploaded to the Play Store."
             echo "- Verify the download with \`SHA256SUMS.txt\`."
