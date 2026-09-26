@@ -40,6 +40,25 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Resolve version from tag
+        id: ver
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Tag '$TAG' must look like vMAJOR.MINOR.PATCH to derive a version."
+            exit 1
+          fi
+          major="${version%%.*}"
+          rest="${version#*.}"
+          minor="${rest%%.*}"
+          patch="${rest##*.}"
+          code=$(( major * 10000 + minor * 100 + patch ))
+          printf 'tag=%s\nversion=%s\ncode=%s\n' "$TAG" "$version" "$code" >> "$GITHUB_OUTPUT"
+          echo "Resolved $TAG -> versionName=$version versionCode=$code"
+
       - name: Prepare signing key, Firebase stub and Gradle wrapper
         run: |
           set -euo pipefail
@@ -56,7 +75,12 @@ jobs:
           chmod +x ./gradlew
 
       - name: Build release APK
-        run: ./gradlew :app:assembleRelease -Psomno.abi=arm64-v8a --no-daemon --stacktrace
+        run: |
+          ./gradlew :app:assembleRelease \
+            -Psomno.abi=arm64-v8a \
+            "-Psomno.versionName=${{ steps.ver.outputs.version }}" \
+            "-Psomno.versionCode=${{ steps.ver.outputs.code }}" \
+            --no-daemon --stacktrace
 
       - name: Verify arm64-only packaging
         id: verify
@@ -73,13 +97,13 @@ jobs:
 
       - name: Collect artifact
         id: collect
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
           set -euo pipefail
           mkdir -p dist
           apk="$(ls app/build/outputs/apk/release/*.apk | head -n 1)"
-          version="$(sed -n 's/^[[:space:]]*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
-          version="${version:-unversioned}"
-          name="Somno-${version}-arm64.apk"
+          name="Somno-${VERSION}-arm64.apk"
           cp "$apk" "dist/$name"
           ( cd dist && sha256sum "$name" > SHA256SUMS.txt )
           printf 'name=%s\n' "$name" >> "$GITHUB_OUTPUT"
@@ -97,7 +121,7 @@ jobs:
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          TAG: ${{ steps.ver.outputs.tag }}
           APK_NAME: ${{ steps.collect.outputs.name }}
           ABIS: ${{ steps.verify.outputs.abis }}
         run: |

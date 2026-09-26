@@ -17,8 +17,8 @@ android {
     applicationId = "com.aistudio.somnosleep.shbxc"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = providers.gradleProperty("somno.versionCode").getOrElse("1").toInt()
+    versionName = providers.gradleProperty("somno.versionName").getOrElse("1.0")
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
